@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LetsEncrypt", "LetsEncrypt\LetsEncrypt.csproj", "{C17DB208-BE4F-4BCE-B5A3-A8128E205D0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LetsEncrypt.AzureKeyVault", "LetsEncrypt.AzureKeyVault\LetsEncrypt.AzureKeyVault.csproj", "{2B2C1A11-7233-489C-AFC5-7420D132DDEF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C17DB208-BE4F-4BCE-B5A3-A8128E205D0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C17DB208-BE4F-4BCE-B5A3-A8128E205D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C17DB208-BE4F-4BCE-B5A3-A8128E205D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C17DB208-BE4F-4BCE-B5A3-A8128E205D0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B2C1A11-7233-489C-AFC5-7420D132DDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B2C1A11-7233-489C-AFC5-7420D132DDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B2C1A11-7233-489C-AFC5-7420D132DDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B2C1A11-7233-489C-AFC5-7420D132DDEF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
