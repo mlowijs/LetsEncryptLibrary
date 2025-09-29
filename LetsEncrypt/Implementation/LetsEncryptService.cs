@@ -33,14 +33,14 @@ public class LetsEncryptService(LetsEncryptClient client, IKeyStore keyStore) : 
         return true;
     }
 
-    public async Task<CreateOrderResult?> CreateOrderAsync(string challengeType, IEnumerable<string> hostNames)
+    public async Task<CreateOrderResult> CreateOrderAsync(string challengeType, IEnumerable<string> hostNames)
     {
         if (_keyStoreEntry is null)
             throw new InvalidOperationException("Service not initialized");
         
         var order = await client.CreateOrderAsync(hostNames);
         if (order is null)
-            return null;
+            return new(CreateOrderError.OrderNotFound);
 
         var authorizations = await Task.WhenAll(order.AuthorizationUrls.Select(client.GetAuthorizationAsync));
         var challenges = new List<ChallengeDetails>();
@@ -57,12 +57,8 @@ public class LetsEncryptService(LetsEncryptClient client, IKeyStore keyStore) : 
                 ValidationValue = validationValue
             });
         }
-        
-        return new()
-        {
-            Order = order,
-            Challenges = challenges.ToArray()
-        };
+
+        return new(order, challenges.ToArray());
     }
 
     public async Task<AcquireCertificateResult> AcquireCertificateAsync(Order order, string challengeType, RSA certificateKeyPair, TimeSpan timeout)
