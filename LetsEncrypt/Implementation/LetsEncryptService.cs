@@ -23,14 +23,14 @@ public class LetsEncryptService(LetsEncryptClient client, IKeyStore keyStore) : 
         return true;
     }
 
-    public async Task<bool> InitializeAsync(string accountId)
+    public async Task<InitializeResult> InitializeAsync(string accountId)
     {
         _keyStoreEntry = await keyStore.GetEntryAsync(accountId);
         if (_keyStoreEntry is null)
-            return false;
+            return new(false, InitializeError.KeyNotFound);
         
         client.ConfigureAuthorization(_keyStoreEntry.AccountUrl, plaintext => keyStore.SignDataAsync(_keyStoreEntry, plaintext));
-        return true;
+        return new(true);
     }
 
     public async Task<CreateOrderResult> CreateOrderAsync(string challengeType, IEnumerable<string> hostNames)
