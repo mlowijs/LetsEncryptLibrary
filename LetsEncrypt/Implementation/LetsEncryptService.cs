@@ -29,7 +29,7 @@ public class LetsEncryptService(LetsEncryptClient client, IKeyStore keyStore) : 
         if (_keyStoreEntry is null)
             return false;
         
-        client.Configure(_keyStoreEntry.AccountUrl, plaintext => keyStore.SignDataAsync(_keyStoreEntry, plaintext));
+        client.ConfigureAuthorization(_keyStoreEntry.AccountUrl, plaintext => keyStore.SignDataAsync(_keyStoreEntry, plaintext));
         return true;
     }
 
@@ -80,7 +80,7 @@ public class LetsEncryptService(LetsEncryptClient client, IKeyStore keyStore) : 
         {
             order = await client.GetOrderAsync(order.Url);
 
-            if (order?.Status == "valid")
+            if (order?.Status == Statuses.Valid)
             {
                 var certificatePem = await client.DownloadCertificateAsync(order.CertificateUrl!);
                 var certificate = X509Certificate2.CreateFromPem(certificatePem);
@@ -108,10 +108,10 @@ public class LetsEncryptService(LetsEncryptClient client, IKeyStore keyStore) : 
             authorizations =
                 await Task.WhenAll(order.AuthorizationUrls.Select(client.GetAuthorizationAsync));
 
-            if (authorizations.Any(a => a.Status == "invalid"))
+            if (authorizations.Any(a => a.Status == Statuses.Invalid))
                 return new AcquireCertificateResult(false, Error: AcquireCertificateError.ChallengeInvalid);
             
-            if (authorizations.All(a => a.Status == "valid"))
+            if (authorizations.All(a => a.Status == Statuses.Valid))
                 return new AcquireCertificateResult(true);
             
             await Task.Delay(PollInterval);
@@ -147,8 +147,8 @@ public class LetsEncryptService(LetsEncryptClient client, IKeyStore keyStore) : 
     
         return challenge.Type switch
         {
-            "http-01" => keyAuthorization,
-            "dns-01" => Base64Url.EncodeToString(SHA256.HashData(Encoding.UTF8.GetBytes(keyAuthorization))),
+            ChallengeTypes.Http01 => keyAuthorization,
+            ChallengeTypes.Dns01 => Base64Url.EncodeToString(SHA256.HashData(Encoding.UTF8.GetBytes(keyAuthorization))),
     
             _ => ""
         };

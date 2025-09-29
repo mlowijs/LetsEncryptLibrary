@@ -26,7 +26,7 @@ public class LetsEncryptClient(bool staging = false) : ILetsEncryptClient
     private Uri? _accountUrl;
     private Func<byte[], Task<byte[]>>? _signData;
     
-    public void Configure(Uri accountUrl, Func<byte[], Task<byte[]>> signData)
+    public void ConfigureAuthorization(Uri accountUrl, Func<byte[], Task<byte[]>> signData)
     {
         _accountUrl = accountUrl;
         _signData = signData;
@@ -43,7 +43,7 @@ public class LetsEncryptClient(bool staging = false) : ILetsEncryptClient
         if (!response.IsSuccessStatusCode)
             return null;
 
-        var account = await response.Content.ReadFromJsonAsync<Account>();
+        var account = await response.Content.ReadFromJsonAsync<Account>(SerializerOptions);
         account!.Url = response.Headers.Location!;
 
         return account;
@@ -124,7 +124,7 @@ public class LetsEncryptClient(bool staging = false) : ILetsEncryptClient
     private async Task<HttpResponseMessage> SendAuthenticatedRequest(Uri url, object payload, ECDsa? keyPair = null)
     {
         if (_accountUrl is null || _signData is null)
-            throw new InvalidOperationException("Not logged in.");
+            throw new InvalidOperationException("Authorization not configured.");
         
         var nonceRequest = new HttpRequestMessage(HttpMethod.Head, new Uri(_url, "new-nonce"));
         var nonceResponse = await _httpClient.SendAsync(nonceRequest);

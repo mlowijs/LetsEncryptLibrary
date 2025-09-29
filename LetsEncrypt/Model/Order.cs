@@ -11,7 +11,6 @@ public record Order
     public required Uri[] AuthorizationUrls { get; init; }
     [JsonPropertyName("finalize")]
     public required Uri FinalizeUrl { get; init; }
-    [JsonPropertyName("identifiers")]
     public required Identifier[] Identifiers { get; init; }
     [JsonPropertyName("certificate")]
     public Uri? CertificateUrl { get; init; }

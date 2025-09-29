@@ -6,8 +6,8 @@ namespace LetsEncrypt;
 
 public interface ILetsEncryptClient
 {
-    void Configure(Uri accountUrl, Func<byte[], Task<byte[]>> signData);
     Task<Account?> CreateAccountAsync(IEnumerable<string> emailAddresses, ECDsa keyPair);
+    void ConfigureAuthorization(Uri accountUrl, Func<byte[], Task<byte[]>> signData);
     Task<Order?> GetOrderAsync(Uri orderUrl);
     Task<Order?> CreateOrderAsync(IEnumerable<string> hostNames);
     Task<Authorization?> GetAuthorizationAsync(Uri authorizationUrl);
