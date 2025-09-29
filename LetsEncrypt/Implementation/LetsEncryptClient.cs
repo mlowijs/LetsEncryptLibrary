@@ -123,14 +123,14 @@ public class LetsEncryptClient(bool staging = false) : ILetsEncryptClient
     
     private async Task<HttpResponseMessage> SendAuthenticatedRequest(Uri url, object payload, ECDsa? keyPair = null)
     {
-        if (_accountUrl is null || _signData is null)
+        if ((_accountUrl is null || _signData is null) && keyPair is null)
             throw new InvalidOperationException("Authorization not configured.");
         
         var nonceRequest = new HttpRequestMessage(HttpMethod.Head, new Uri(_url, "new-nonce"));
         var nonceResponse = await _httpClient.SendAsync(nonceRequest);
         var nonce = nonceResponse.Headers.GetValues("Replay-Nonce").First();
         
-        var protectedHeader = new JwsProtectedHeader(_accountUrl.AbsoluteUri, nonce, url);
+        JwsProtectedHeader protectedHeader;
         if (keyPair is not null)
         {
             var ecParams = keyPair.ExportParameters(false);
@@ -139,6 +139,10 @@ public class LetsEncryptClient(bool staging = false) : ILetsEncryptClient
                 X = Base64Url.EncodeToString(ecParams.Q.X),
                 Y = Base64Url.EncodeToString(ecParams.Q.Y),
             }, nonce, url);
+        }
+        else
+        {
+            protectedHeader = new JwsProtectedHeader(_accountUrl!.AbsoluteUri, nonce, url);
         }
         
         var joseProtected =
@@ -149,7 +153,7 @@ public class LetsEncryptClient(bool staging = false) : ILetsEncryptClient
         var bytesToSign = Encoding.UTF8.GetBytes($"{joseProtected}.{josePayload}");
         var signature = keyPair is not null
             ? keyPair.SignData(bytesToSign, HashAlgorithmName.SHA256)
-            : await _signData(bytesToSign);
+            : await _signData!(bytesToSign);
 
         var jose = new Jose
         {
